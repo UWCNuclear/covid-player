@@ -79,7 +79,6 @@ covid_viewer::covid_viewer(const TGWindow *p, UInt_t w, UInt_t h): TGMainFrame(p
 
     fCountryBox = new TGComboBox(hframe);
     fCountryBox->Resize(200,20);
-    fCountryBox->AddEntry("Country",0);
     UpdateCountryList();
     fCountryBox->Select(0);
     fCountryBox->Connect("Selected(Int_t)", "covid_viewer", this, "ReadData()");
@@ -276,6 +275,7 @@ void covid_viewer::UpdateCountryList()
     if(getenv("COVID_PLAYER_SYS") == nullptr) exit(EXIT_FAILURE);
 
     fCountryBox->RemoveAll();
+    fCountryBox->AddEntry("Country",0);
 
     TString DatabaseDir = Form("%s/database/",getenv("COVID_PLAYER_SYS"));
 
