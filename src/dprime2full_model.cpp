@@ -135,7 +135,7 @@ dprime2full_model::dprime2full_model(const TGCompositeFrame *MotherFrame, UInt_t
     fGroupFrame->AddFrame(fHorizontalFrame,new TGLayoutHints(kLHintsCenterY | kLHintsLeft | kLHintsExpandX,-10,-10,5,0));
 
     fHorizontalFrame = new TGCompositeFrame(fGroupFrame, 60, 20, kHorizontalFrame);
-    label = new TGLabel(fHorizontalFrame, "c = ");label->SetTextColor(CXred);
+    label = new TGLabel(fHorizontalFrame, "c2 = ");label->SetTextColor(CXred);
     fHorizontalFrame->AddFrame(label,new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 3, 3, 0, 0));
     fNE_c2[0] = new TGNumberEntry(fHorizontalFrame, fInitPars[5], 7,0, TGNumberFormat::kNESReal, TGNumberFormat::kNEAPositive ,TGNumberFormat::kNELNoLimits);
     fHorizontalFrame->AddFrame(fNE_c2[0],new TGLayoutHints(kLHintsCenterY | kLHintsLeft| kLHintsExpandX,0,0,0,0));
