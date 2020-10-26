@@ -51,7 +51,7 @@ It allows to define different options:
 
 # The fit window
 
-The fit models are taken from our publication: https://arxiv.org/abs/2005.06742
+The fit models are taken from our publication: https://doi.org/10.1016/j.apm.2020.10.019
 
 They are only defined for deaths distributions.
 
@@ -86,3 +86,8 @@ source ${SoftDir}/ROOT/install/bin/thisroot.sh
 ```
 
 To have this automatically done when starting a new terminal, add this command to your .bashrc file
+
+# Contact
+
+In case of any error for installation or bugs in the program, contact: j.dudouet@ip2i.in2p3.fr
+
