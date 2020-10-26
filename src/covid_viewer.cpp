@@ -12,6 +12,7 @@
 #include "TGFileDialog.h"
 #include "TGTab.h"
 #include "TF1.h"
+#include "TVirtualX.h"
 
 #include "dprime_model.h"
 #include "dprime2_model.h"

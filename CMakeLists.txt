@@ -84,7 +84,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${Lib_NAME}_rdict.pcm DESTINATION l
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${Lib_NAME}.rootmap DESTINATION lib)
 install(FILES ${covid_viewer_HEAD} DESTINATION include COMPONENT headers)
 
-file(GLOB database ${CMAKE_CURRENT_SOURCE_DIR}/DataBase)
+file(GLOB database ${CMAKE_CURRENT_SOURCE_DIR}/dataBase)
 file(GLOB scripts ${CMAKE_CURRENT_SOURCE_DIR}/scripts)
 
 install(DIRECTORY ${database} DESTINATION ${CMAKE_INSTALL_PREFIX})

@@ -24,6 +24,18 @@ cmake --build . -- install -j8 # if you have 8 cores available for compilation
 cd ..
 ```
 
+Some python3 depedancies are necessary to download the data from worldometers:
+
+```
+pip3 install numpy
+pip3 install pandas
+pip3 install bs4
+pip3 install tqdm
+```
+
+Note: the python3-pip package is necessary
+
+
 # load environment and execute
 
 ```
