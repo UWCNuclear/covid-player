@@ -42,7 +42,7 @@ endif()
 
 INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIR} )
 LINK_DIRECTORIES( ${ROOT_LIBRARY_DIR} )
-SET(EXTRA_EXTERNAL_LIBRARIES ${EXTRA_EXTERNAL_LIBRARIES} Core Minuit2 MathCore Hist Gui Gpad Graf Tree Rint RIO Proof TreePlayer Physics)
+SET(EXTRA_EXTERNAL_LIBRARIES ${EXTRA_EXTERNAL_LIBRARIES} Core MathCore Hist Gui Gpad Graf Tree Rint RIO Proof TreePlayer Physics)
 
 set( COVID_PLAYER_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib )
 set( COVID_PLAYER_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin )
@@ -84,7 +84,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${Lib_NAME}_rdict.pcm DESTINATION l
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${Lib_NAME}.rootmap DESTINATION lib)
 install(FILES ${covid_viewer_HEAD} DESTINATION include COMPONENT headers)
 
-file(GLOB database ${CMAKE_CURRENT_SOURCE_DIR}/dataBase)
+file(GLOB database ${CMAKE_CURRENT_SOURCE_DIR}/database)
 file(GLOB scripts ${CMAKE_CURRENT_SOURCE_DIR}/scripts)
 
 install(DIRECTORY ${database} DESTINATION ${CMAKE_INSTALL_PREFIX})
