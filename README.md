@@ -2,6 +2,8 @@
 
 The covid-player is a ROOT based graphical utility to plot and fit covid19 data
 
+![Alt text](pictures/covid-player.png?raw=true "Title")
+
 # prerequisite
 
 You need to have a ROOT version > 6 installed
