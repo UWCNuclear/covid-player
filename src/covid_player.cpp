@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
     ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2","Migrad");
     ROOT::Math::MinimizerOptions::SetDefaultTolerance(0.05);
     ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(2147483647);
+    ROOT::Math::MinimizerOptions::SetDefaultErrorDef(2);
 
     // make sure that the Gpad and GUI libs are loaded
     TApplication::NeedGraphicsLibs();

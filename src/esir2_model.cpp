@@ -176,8 +176,8 @@ esir2_model::esir2_model(const TGCompositeFrame *MotherFrame, UInt_t w, UInt_t h
     fHorizontalFrame->AddFrame(fFitRange[1],new TGLayoutHints(kLHintsCenterY | kLHintsLeft| kLHintsExpandX,0,0,0,0));
     fGroupFrame->AddFrame(fHorizontalFrame,new TGLayoutHints(kLHintsCenterY | kLHintsLeft | kLHintsExpandX,-10,-10,5,0));
 
-    fFitRange[0]->SetText(fMainWindow->GetDateMin());
-    fFitRange[1]->SetText(fMainWindow->GetDateMax());
+    fFitRange[0]->Connect("TextChanged(const char *)", "fitmodel", this, "CheckRange()");
+    fFitRange[1]->Connect("TextChanged(const char *)", "fitmodel", this, "CheckRange()");
 
     fGroupFrame = new TGGroupFrame(MotherFrame, "Fit results", kVerticalFrame);
     fGroupFrame->SetTextColor(CXblue);
@@ -201,7 +201,7 @@ void esir2_model::InitParameters()
 
     fFitFunction = new TF1(Form("ESIR2_%s",h->GetName()),this,&esir2_model::FitFunction,h->GetXaxis()->GetXmin(),h->GetXaxis()->GetXmax(),fNPars,"fitmodel","FitFunction");
     fFitFunction->SetNpx(1000);
-    fFitFunction->SetLineColor(kBlue);
+    fFitFunction->SetLineColor(kRed);
 
     fFitFunction->SetParName(0,"a");
     fFitFunction->SetParName(1,"b");

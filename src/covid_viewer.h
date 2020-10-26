@@ -130,6 +130,10 @@ private:
     minimizer *fminimizer = nullptr;
 
 public:
+    TString fFitMinGlobal;
+    TString fFitMaxGlobal;
+
+public:
 
     covid_viewer(const TGWindow *p, UInt_t w, UInt_t h);
     virtual ~covid_viewer();

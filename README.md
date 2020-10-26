@@ -6,23 +6,28 @@ The covid-player is a ROOT based graphical utility to plot and fit covid19 data
 
 You need to have a ROOT version > 6 installed
 
-# installation
+See at the end of the page for the ROOT installation (needs to be done bedore covid-player installation
 
-from your software directory, download the sources from gitlab and compile the software:
+# covid-player installation
+
+Assuming you are woorking in your software directory (labelled here ${SoftDir}), from your software directory, download the sources from gitlab and compile the software:
 
 ```
+mkdir ${SoftDir}/covid-player
+cd ${SoftDir}/covid-player
+cd covid-player
 git clone https://gitlab.in2p3.fr/dudouet/covid-player.git sources
 mkdir build install
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=../install ../sources/
-cmake --build . -- install -j4 # if you have 4 cores available for compilation
+cmake --build . -- install -j8 # if you have 8 cores available for compilation
 cd ..
 ```
 
 # load environment and execute
 
 ```
-source install/bin/covid-player-env.sh
+source ${SoftDir}/install/bin/covid-player-env.sh
 covid-player
 ```
 
@@ -52,4 +57,32 @@ They are only defined for deaths distributions.
 
 The range of the fit, and parameter initialization and limits needs to be refine in most cases to have a successful fit convergence
 
+# ROOT installation
 
+1 - First, you need to install the prerequisite packages for ROOT installation. The commands, dependant on your system are listed on the ROOT website: https://root.cern/install/dependencies/
+
+2- Assuming you are woorking in your software directory (labelled here ${SoftDir}), from your software directory, download the ROOT sources from gitlab and compile the software, it can be quite long if you don't have many cores on your computer:
+
+```
+mkdir ${SoftDir}/ROOT
+cd ${SoftDir}/ROOT
+git clone https://github.com/root-project/root.git sources
+cd sources
+git checkout -b v6-20-00 v6-20-00
+cd ..
+mkdir build install
+cd build
+cmake -Dmathmore=On -Dminuit2=On -Dbuiltin_glew=ON -DCMAKE_INSTALL_PREFIX=../install ../sources/
+cmake --build . -- install -j8 # if you have 8 cores available for compilation
+cd ..
+```
+
+# load ROOT environment variable
+
+To load the ROOT toolkit, use the following command:
+
+```
+source ${SoftDir}/ROOT/install/bin/thisroot.sh
+```
+
+To have this automatically done when starting a new terminal, add this command to your .bashrc file

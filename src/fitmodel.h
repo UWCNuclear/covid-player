@@ -68,6 +68,8 @@ public:
     virtual void SetMainWindow(covid_viewer *w);
 
     virtual void DoFit();
+    void CheckRange();
+    void UpdateRange();
 
     ClassDef(fitmodel,0);
 };

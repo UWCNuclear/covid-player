@@ -382,6 +382,9 @@ void covid_viewer::PlotData()
     gPad->Update();
 
     fHistoToFit = fCurrentHist;
+
+    fFitMinGlobal = GetDateMin();
+    fFitMaxGlobal = GetDateMax();
 }
 
 bool covid_viewer::ReadData()
@@ -582,8 +585,8 @@ bool covid_viewer::ReadData()
     TString LastDate = vDates.back();
 
 //    fDataDailyHist->SetBinContent(1,0.001);
-    fDataDailyHist->SetBinContent(NDaysInYear,0.001);
-    fDataDailyHist->SetBinError(NDaysInYear,0.001);
+//    fDataDailyHist->SetBinContent(NDaysInYear,0.001);
+//    fDataDailyHist->SetBinError(NDaysInYear,0.001);
 
     for(size_t i=0 ; i<vDates.size() ; i++) {
         if(i<vDeaths_Tot.size() && vDeaths_Tot.at(i)) {
@@ -620,11 +623,11 @@ void covid_viewer::SmoothVector(Int_t smooth, vector<double> &data, vector<doubl
         Double_t Err2 = 0.;
 
 
-        if(i>=smooth) {
+        if(i>=(size_t)smooth) {
             for(int ii=0 ; ii<smooth ; ii++) {
                 if((data.at(i-ii)>0)) {
                     Tot += data.at(i-ii);
-                    Err2 += TMath::Power(sqrt(data.at(i-ii)),2);
+                    Err2 += 2.*TMath::Power(sqrt(data.at(i-ii)),2);
                     NPoints ++;
                 }
             }
@@ -933,6 +936,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fDprimeModelTab,ModelName);
+        fDPrime_Model->UpdateRange();
     }
     if(ModelName=="D'2 Model") {
         if(fDPrime2_Model==nullptr) {
@@ -944,6 +948,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fDprime2ModelTab,ModelName);
+        fDPrime2_Model->UpdateRange();
     }
     if(ModelName=="D'2 Full Model") {
         if(fDPrime2Full_Model==nullptr) {
@@ -955,6 +960,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fDprime2FullModelTab,ModelName);
+        fDPrime2Full_Model->UpdateRange();
     }
     if(ModelName=="ESIR Model") {
         if(fESIR_Model==nullptr) {
@@ -966,6 +972,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fESIRModelTab,ModelName);
+        fESIR_Model->UpdateRange();
     }
     if(ModelName=="ESIR2 Model") {
         if(fESIR2_Model==nullptr) {
@@ -977,6 +984,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fESIR2ModelTab,ModelName);
+        fESIR2_Model->UpdateRange();
     }
     if(ModelName=="ESIR2 Full Model") {
         if(fESIR2Full_Model==nullptr) {
@@ -988,6 +996,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fESIR2FullModelTab,ModelName);
+        fESIR2Full_Model->UpdateRange();
     }
 
     if(ModelName=="D Model") {
@@ -1000,6 +1009,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fDModelTab,ModelName);
+        fD_Model->UpdateRange();
     }
     if(ModelName=="D2 Model") {
         if(fD2_Model==nullptr) {
@@ -1011,6 +1021,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fD2ModelTab,ModelName);
+        fD2_Model->UpdateRange();
     }
     if(ModelName=="D2 Full Model") {
         if(fD2Full_Model==nullptr) {
@@ -1022,6 +1033,7 @@ void covid_viewer::HandleModels()
             Layout();
         }
         ToggleTab(fD2FullModelTab,ModelName);
+        fD2Full_Model->UpdateRange();
     }
 
 }

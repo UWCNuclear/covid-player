@@ -110,18 +110,32 @@ void fitmodel::DoFit()
     // Store data to fit in a TGraph
 
     TGraphErrors *g = new TGraphErrors;
+    Float_t xMax=0.;
+    Float_t yMax=0.;
 
     for(int i=1 ; i<=hdummy->GetNbinsX() ; i++) {
         if(h->GetBinContent(i)==0) continue;
-        if( (i==1) || (i==hdummy->GetNbinsX()) ) {
-            g->SetPoint(g->GetN(),hdummy->GetBinCenter(i),h->GetBinContent(i));
-            g->SetPointError(g->GetN()-1,0.,h->GetBinError(i));
-        }
+//        if( (i==1) || (i==hdummy->GetNbinsX()) ) {
+//            g->SetPoint(g->GetN(),hdummy->GetBinCenter(i),h->GetBinContent(i));
+//            g->SetPointError(g->GetN()-1,0.,h->GetBinError(i));
+//        }
         else if((i >= hdummy->GetXaxis()->FindFixBin(fFitRange[0]->GetText())) && (i <= hdummy->GetXaxis()->FindFixBin(fFitRange[1]->GetText()))) {
             g->SetPoint(g->GetN(),hdummy->GetBinCenter(i),h->GetBinContent(i));
             g->SetPointError(g->GetN()-1,0.,h->GetBinError(i));
+
+            if(h->GetBinContent(i)>yMax) {
+                yMax = h->GetBinContent(i);
+                xMax = hdummy->GetBinCenter(i);
+            }
         }
     }
+
+    // Add a dummy point at 5* the current max (to force to be at 0 for t infinity)
+
+    g->SetPoint(g->GetN(),5*xMax,0.);
+    g->SetPointError(g->GetN()-1,0.,0.1);
+
+    fFitFunction->FixParameter(fFitFunction->GetNpar()-1,g->GetX()[0]);
 
     fFitResult = g->Fit(fFitFunction,"S0");
 
@@ -137,7 +151,7 @@ void fitmodel::DoFit()
     fErrorBand->SetName(((TString)h->GetName()).Append("_error"));
     (TVirtualFitter::GetFitter())->GetConfidenceIntervals(fErrorBand);
 
-    delete g;
+//    delete g;
 
     //Now the "hint" histogram has the fitted function values as the
     //bin contents and the confidence intervals as bin errors
@@ -167,7 +181,7 @@ void fitmodel::PrintResults()
     else
         text << " Failed" << endl;
     cout<<text.str();
-    if(fFitResult->Status()==0)
+    if(fFitResult->Status()<3)
         PrintInListBox(text.str(),kPrint);
     else
         PrintInListBox(text.str(),kError);
@@ -190,6 +204,33 @@ void fitmodel::PrintResults()
         PrintInListBox(text.str(),kInfo);
         text.str("");
     }
+}
+
+void fitmodel::UpdateRange()
+{
+    if(fMainWindow == nullptr) return;
+
+    fFitRange[0]->SetText(fMainWindow->fFitMinGlobal);
+    fFitRange[1]->SetText(fMainWindow->fFitMaxGlobal);
+}
+
+void fitmodel::CheckRange()
+{
+    if(fMainWindow == nullptr) return;
+
+    TH1 *hdummy = fMainWindow->GetDummyHist();
+
+    if(hdummy->GetXaxis()->FindFixBin(fFitRange[0]->GetText())>0) {
+        fFitRange[0]->SetTextColor(CXblue);
+        fMainWindow->fFitMinGlobal = fFitRange[0]->GetText();
+    }
+    else fFitRange[0]->SetTextColor(CXred);
+
+    if(hdummy->GetXaxis()->FindFixBin(fFitRange[1]->GetText())>0) {
+        fFitRange[1]->SetTextColor(CXblue);
+        fMainWindow->fFitMaxGlobal = fFitRange[1]->GetText();
+    }
+    else fFitRange[1]->SetTextColor(CXred);
 }
 
 ClassImp(fitmodel)
