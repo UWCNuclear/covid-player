@@ -8,11 +8,11 @@ The covid-player is a ROOT based graphical utility to plot and fit covid19 data
 
 You need to have a ROOT version > 6 installed
 
-See at the end of the page for the ROOT installation (needs to be done bedore covid-player installation
+See at the end of the page for the ROOT installation (needs to be done bedore covid-player installation)
 
 # covid-player installation
 
-Assuming you are woorking in your software directory (labelled here ${SoftDir}), from your software directory, download the sources from gitlab and compile the software:
+Assuming you are working in your software directory (labelled here ${SoftDir}), from your software directory, download the sources from gitlab and compile the software:
 
 ```
 mkdir ${SoftDir}/covid-player
@@ -47,21 +47,21 @@ covid-player
 
 # How to use covid-player
 
-The fisrst thing to do is to update the database. This is done using the toolbar: Data/Update
-The data are automatically downloaded from worldometers website
-The list of coutries to dowload can be modified in the file : install/scripts/script.py
+The first thing to do is to update the database. This is done using the toolbar: Data/Update
+The data are automatically downloaded from the worldometers website: https://www.worldometers.info/coronavirus
+The list of coutries that are downloaded can be modified in the file : install/scripts/script.py
 
 # The Tools bar
 
 It allows to define different options:
 - Type of data to plot (deaths or cases)
-- The coutry to plot
+- The countries to plot
 - Total or daily counts
-- The number of average days for data smoothing
+- The number of averaged days for data smoothing
 - The axis range
 - The Plot button, to plot the data
 - The Color of the plot that will be drawn
-- The same option if we want to overload the graphicals
+- The "same" option if you want to overload the graphs
 
 # The fit window
 
@@ -69,13 +69,13 @@ The fit models are taken from our publication: https://doi.org/10.1016/j.apm.202
 
 They are only defined for deaths distributions.
 
-The range of the fit, and parameter initialization and limits needs to be refine in most cases to have a successful fit convergence
+The range of the fit, and parameter initialization and limits needs to be refined in some cases to have a successful fit convergence.
 
 # ROOT installation
 
-1 - First, you need to install the prerequisite packages for ROOT installation. The commands, dependant on your system are listed on the ROOT website: https://root.cern/install/dependencies/
+1 - First, you need to install the prerequisite packages for ROOT installation. The commands, depending on your computer system are listed on the ROOT website: https://root.cern/install/dependencies/
 
-2- Assuming you are woorking in your software directory (labelled here ${SoftDir}), from your software directory, download the ROOT sources from gitlab and compile the software, it can be quite long if you don't have many cores on your computer:
+2- Assuming you are working in your software directory (labelled here ${SoftDir}), from your software directory, download the ROOT sources from gitlab and compile the software, it can be quite long if you don't have many cores on your computer:
 
 ```
 mkdir ${SoftDir}/ROOT
@@ -103,5 +103,5 @@ To have this automatically done when starting a new terminal, add this command t
 
 # Contact
 
-In case of any error for installation or bugs in the program, contact: j.dudouet@ip2i.in2p3.fr
+In case of any error for installation or bugs in the program, contact: j.dudouet@ip2i.in2p3.fr, or directly use the issues system of gitlab
 
