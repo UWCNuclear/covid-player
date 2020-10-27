@@ -13,6 +13,8 @@
 #include "TH1D.h"
 #include "TGColorSelect.h"
 #include "TGMenu.h"
+#include "TLatex.h"
+
 #include "minimizer.h"
 
 #include <vector>
@@ -128,6 +130,8 @@ private:
     esir2full_model *fESIR2Full_Model = nullptr;
 
     minimizer *fminimizer = nullptr;
+
+    vector <TLatex*> fHistNames;
 
 public:
     TString fFitMinGlobal;

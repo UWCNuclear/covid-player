@@ -334,21 +334,18 @@ void covid_viewer::PlotData()
         }
     }
 
-    if(fCanvas->GetListOfPrimitives()->FindObject(fCurrentHist->GetName()) == nullptr) {
-
-        if(fDrawSameButton->GetState() == kButtonUp) {
-            fCurrentHist->Draw("p");
-            fHistotofitBox->RemoveAll();
-            Int_t Id = fHistotofitBox->GetNumberOfEntries();
-            fHistotofitBox->AddEntry(fCurrentHist->GetName(),Id);
-            fHistotofitBox->Select(Id);
-        }
-        else {
-            fCurrentHist->Draw("p same");
-            Int_t Id = fHistotofitBox->GetNumberOfEntries();
-            fHistotofitBox->AddEntry(fCurrentHist->GetName(),Id);
-            fHistotofitBox->Select(Id);
-        }
+    if(fDrawSameButton->GetState() == kButtonUp) {
+        fCurrentHist->Draw("p");
+        fHistotofitBox->RemoveAll();
+        Int_t Id = fHistotofitBox->GetNumberOfEntries();
+        fHistotofitBox->AddEntry(fCurrentHist->GetName(),Id);
+        fHistotofitBox->Select(Id);
+    }
+    else if((fCanvas->GetListOfPrimitives()->FindObject(fCurrentHist->GetName()) == nullptr)) {
+        fCurrentHist->Draw("p same");
+        Int_t Id = fHistotofitBox->GetNumberOfEntries();
+        fHistotofitBox->AddEntry(fCurrentHist->GetName(),Id);
+        fHistotofitBox->Select(Id);
     }
 
     Pixel_t pixel = fColorSel->GetColor();
@@ -386,6 +383,34 @@ void covid_viewer::PlotData()
 
     fFitMinGlobal = GetDateMin();
     fFitMaxGlobal = GetDateMax();
+
+    Float_t XVal = gPad->GetFrame()->GetX1()+0.01*(gPad->GetFrame()->GetX2()-gPad->GetFrame()->GetX1());
+    Float_t YVal = gPad->GetFrame()->GetY2()-0.04*(gPad->GetFrame()->GetY2()-gPad->GetFrame()->GetY1());
+
+    Int_t NDY=0;
+    Float_t DY = (gPad->GetFrame()->GetY2()-gPad->GetFrame()->GetY1())*0.05;
+
+    for(auto i: fHistNames) delete i;
+    fHistNames.clear();
+
+    for(int i=0 ; i<fCanvas->GetListOfPrimitives()->GetEntries() ; i++) {
+        TObject *obj = fCanvas->GetListOfPrimitives()->At(i);
+        if(obj->InheritsFrom(TH1::Class())) {
+            TH1 *hist = (TH1*) obj;
+            TString Name = hist->GetTitle();
+            TLatex *text = new TLatex(XVal,YVal-DY*NDY,Name);
+            text->SetTextColor(hist->GetLineColor());
+            text->SetTextSize(0.04);
+            text->SetTextFont(132);
+            text->Draw();
+            NDY++;
+            fHistNames.push_back(text);
+        }
+    }
+
+    gPad->Modified();
+    gPad->Update();
+
 }
 
 bool covid_viewer::ReadData()
@@ -403,21 +428,34 @@ bool covid_viewer::ReadData()
     TString DataGraphNameDaily = CountryName;
     TString DataGraphNameTotal = CountryName;
 
+    TString DataGraphTitleDaily = CountryName.Copy().ReplaceAll("_"," ");
+    TString DataGraphTitleTotal = CountryName.Copy().ReplaceAll("_"," ");
+
     DataGraphNameDaily += "_Daily";
     DataGraphNameTotal += "_Total";
+
+    DataGraphTitleDaily += ", daily";
+    DataGraphTitleTotal += ", total";
 
     if(fTypeBox->GetSelected()==1) {
         DataGraphNameDaily += "_Death";
         DataGraphNameTotal += "_Death";
+        DataGraphTitleDaily += " deaths";
+        DataGraphTitleTotal += " deaths";
     }
     else {
         DataGraphNameDaily += "_Cases";
         DataGraphNameTotal += "_Cases";
+        DataGraphTitleDaily += " cases";
+        DataGraphTitleTotal += " cases";
     }
 
     if(fSmooth>1) {
         DataGraphNameDaily += Form("_Smooth%d",fSmooth);
         DataGraphNameTotal += Form("_Smooth%d",fSmooth);
+
+        DataGraphTitleDaily += Form(", %d days average",fSmooth);
+        DataGraphTitleTotal += Form(", %d days average",fSmooth);
     }
 
     TString InputFile = Form("%s/database/%s.csv",getenv("COVID_PLAYER_SYS"),CountryName.Data());
@@ -512,12 +550,13 @@ bool covid_viewer::ReadData()
         fDataTotalHist->Reset();
     }
     else {
-        fDataTotalHist = new TH1D(DataGraphNameTotal,DataGraphNameTotal,NDaysInYear,0,NDaysInYear);
+        fDataTotalHist = new TH1D(DataGraphNameTotal,DataGraphTitleTotal,NDaysInYear,0,NDaysInYear);
     }
 
     fDummyHist = new TH1D("Dummy","Dummy",NDaysInYear,0,NDaysInYear);
 
-    fDataTotalHist->GetYaxis()->SetTitle("TOTAL DEATHS");
+    if(fTypeBox->GetSelected()==0) fDataTotalHist->GetYaxis()->SetTitle("TOTAL CASES");
+    else fDataTotalHist->GetYaxis()->SetTitle("TOTAL DEATHS");
     fDataTotalHist->GetYaxis()->CenterTitle();
     fDataTotalHist->GetXaxis()->SetLabelSize(0.05);
     fDataTotalHist->GetXaxis()->SetTitleOffset(1.);
@@ -541,10 +580,11 @@ bool covid_viewer::ReadData()
         fDataDailyHist->Reset();
     }
     else {
-        fDataDailyHist = new TH1D(DataGraphNameDaily,DataGraphNameDaily,NDaysInYear,0,NDaysInYear);
+        fDataDailyHist = new TH1D(DataGraphNameDaily,DataGraphTitleDaily,NDaysInYear,0,NDaysInYear);
     }
 
-    fDataDailyHist->GetYaxis()->SetTitle("DEATHS / DAY");
+    if(fTypeBox->GetSelected()==0) fDataDailyHist->GetYaxis()->SetTitle("CASES / DAY");
+    else fDataDailyHist->GetYaxis()->SetTitle("DEATH / DAY");
     fDataDailyHist->GetYaxis()->CenterTitle();
     fDataDailyHist->GetXaxis()->SetLabelSize(0.05);
     fDataDailyHist->GetXaxis()->SetTitleOffset(1.);
@@ -585,9 +625,9 @@ bool covid_viewer::ReadData()
 
     TString LastDate = vDates.back();
 
-//    fDataDailyHist->SetBinContent(1,0.001);
-//    fDataDailyHist->SetBinContent(NDaysInYear,0.001);
-//    fDataDailyHist->SetBinError(NDaysInYear,0.001);
+    //    fDataDailyHist->SetBinContent(1,0.001);
+    //    fDataDailyHist->SetBinContent(NDaysInYear,0.001);
+    //    fDataDailyHist->SetBinError(NDaysInYear,0.001);
 
     for(size_t i=0 ; i<vDates.size() ; i++) {
         if(i<vDeaths_Tot.size() && vDeaths_Tot.at(i)) {
