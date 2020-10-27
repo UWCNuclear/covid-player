@@ -364,16 +364,20 @@ void covid_viewer::PlotData()
             break;
         }
     }
+
+    fFirstHist->GetXaxis()->SetRange(DateMin,DateMax);
+
     for(int i=0 ; i<fCanvas->GetListOfPrimitives()->GetEntries() ; i++) {
         TObject *obj = fCanvas->GetListOfPrimitives()->At(i);
         if(obj->InheritsFrom(TH1::Class())) {
             TH1 *hist = (TH1*) obj;
             if(fFirstHist == nullptr) fFirstHist = (TH1*) obj;
-            if(hist->GetBinContent(hist->GetMaximumBin())>Max) Max = hist->GetBinContent(hist->GetMaximumBin());
+            double locmax=0;
+            for(int ibin=DateMin ; ibin<=DateMax ; ibin++) if(hist->GetBinContent(ibin)>locmax) locmax=hist->GetBinContent(ibin);
+            if(locmax>Max) Max = locmax;
         }
     }
 
-    fFirstHist->GetXaxis()->SetRange(DateMin,DateMax);
     fFirstHist->GetYaxis()->SetRangeUser(1,Max*1.2);
 
     gPad->Modified();
