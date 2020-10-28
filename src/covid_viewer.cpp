@@ -261,8 +261,8 @@ covid_viewer::covid_viewer(const TGWindow *p, UInt_t w, UInt_t h): TGMainFrame(p
 
     gStyle->SetTitleSize(0.1,"Pad");
 
-    fCountryBox->Select(2);
-    PlotData();
+//    fCountryBox->Select(2);
+//    PlotData();
 }
 
 covid_viewer::~covid_viewer()
@@ -487,7 +487,6 @@ bool covid_viewer::ReadData()
     while(file) {
         getline(file,line);
         Buffer = line;
-
         TObjArray *arr = nullptr;
 
         if(Buffer.Contains(";")) {
@@ -505,10 +504,10 @@ bool covid_viewer::ReadData()
             arr = Buffer.Tokenize(",");
         }
         else continue;
-
         TString Date = (TString)arr->At(1)->GetName();
         Date.ReplaceAll(" ","-");
         TObjArray *temp = Date.Tokenize("-");
+        if(temp->GetEntries()==0) continue;
         TString Mounth_tmp = (TString)temp->At(0)->GetName();
         Day = ((TString)temp->At(1)->GetName()).Atoi();
         Date = Form("%d-%s-20",Day,Mounth_tmp.Data());
