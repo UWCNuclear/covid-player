@@ -17,7 +17,6 @@ Assuming you are working in your software directory (labelled here ${SoftDir}), 
 ```
 mkdir ${SoftDir}/covid-player
 cd ${SoftDir}/covid-player
-cd covid-player
 git clone https://gitlab.in2p3.fr/dudouet/covid-player.git sources
 mkdir build install
 cd build
