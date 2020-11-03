@@ -51,6 +51,11 @@ The first thing to do is to update the database. This is done using the toolbar:
 The data are automatically downloaded from the worldometers website: https://www.worldometers.info/coronavirus
 The list of coutries that are downloaded can be modified in the file : install/scripts/script.py
 
+# The Option Menu
+
+- It allows to define the minimizer properties
+- It allows to activate an option to plot the numbers relatively to the population of each country
+
 # The Tools bar
 
 It allows to define different options:
