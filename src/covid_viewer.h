@@ -37,7 +37,7 @@ class covid_viewer: public TGMainFrame
 {
 private:
     enum ButtonsTypes {kButtonTotal, kButtonDaily};
-    enum ETestCommandIdentifiers { M_FILE_EXIT, M_FILE_SAVE, M_UPDATE, M_MINIMIZER};
+    enum ETestCommandIdentifiers { M_FILE_EXIT, M_FILE_SAVE, M_UPDATE, M_MINIMIZER,M_POP_RATIO};
 
 private:
 
@@ -137,11 +137,15 @@ public:
     TString fFitMinGlobal;
     TString fFitMaxGlobal;
 
+    map<TString, Int_t> fPopulationMap;
+    bool fApplyPopulationRatio = false;
+
 public:
 
     covid_viewer(const TGWindow *p, UInt_t w, UInt_t h);
     virtual ~covid_viewer();
 
+    void ReadPopulation();
     void ProcessedKeyEvent(Event_t *event);
     void HandleMovement(Int_t EventType, Int_t EventX, Int_t EventY, TObject *selected);
     void HandleButtons(Int_t id=-1);

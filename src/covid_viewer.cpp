@@ -52,6 +52,7 @@ covid_viewer::covid_viewer(const TGWindow *p, UInt_t w, UInt_t h): TGMainFrame(p
     fMenuOptions = new TGPopupMenu(gClient->GetRoot());
     fMenuOptions->Connect("Activated(Int_t)", "covid_viewer", this, "HandleMenu(Int_t)");
     fMenuOptions->AddEntry("Minimizer", M_MINIMIZER);
+    fMenuOptions->AddEntry("Ratio to population", M_POP_RATIO);
 
     fMenuBar = new TGMenuBar(this, 1, 1, kHorizontalFrame);
     this->AddFrame(fMenuBar, new TGLayoutHints(kLHintsExpandX));
@@ -233,6 +234,7 @@ covid_viewer::covid_viewer(const TGWindow *p, UInt_t w, UInt_t h): TGMainFrame(p
     fRootCanvas = new TRootEmbeddedCanvas("PB", Global);
     Global->AddFrame(fRootCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, 5, 5));
     fCanvas = fRootCanvas->GetCanvas();
+    fCanvas->ToggleToolBar();
     fRootCanvas->GetContainer()->Connect("ProcessedEvent(Event_t*)", "covid_viewer", this, "ProcessedKeyEvent(Event_t*)");
     fCanvas->Connect("ProcessedEvent(Int_t, Int_t, Int_t, TObject*)", "covid_viewer", this, "HandleMovement(Int_t,Int_t,Int_t, TObject*)");
 
@@ -261,14 +263,51 @@ covid_viewer::covid_viewer(const TGWindow *p, UInt_t w, UInt_t h): TGMainFrame(p
 
     gStyle->SetTitleSize(0.1,"Pad");
 
-//    fCountryBox->Select(2);
-//    PlotData();
+
+    ReadPopulation();
+    //    fCountryBox->Select(2);
+    //    PlotData();
 }
 
 covid_viewer::~covid_viewer()
 {
     UnmapWindow();
     CloseWindow();
+}
+
+void covid_viewer::ReadPopulation()
+{
+    TString InputFile = Form("%s/database/Population.csv",getenv("COVID_PLAYER_SYS"));
+    ifstream file(InputFile.Data());
+
+    TString Buffer;
+    string line;
+
+    while(file) {
+        getline(file,line);
+        Buffer = line;
+        TObjArray *arr = nullptr;
+
+        if(Buffer.Contains(";")) {
+            Buffer.Append(";");
+            Buffer.ReplaceAll(";;","; ;");
+            Buffer.ReplaceAll(";;","; ;");
+
+            arr = Buffer.Tokenize(";");
+        }
+        else if(Buffer.Contains(",")) {
+            Buffer.Append(",");
+            Buffer.ReplaceAll(",,",", ,");
+            Buffer.ReplaceAll(",,",", ,");
+
+            arr = Buffer.Tokenize(",");
+        }
+        else continue;
+        TString Country = ((TString)arr->At(0)->GetName()).ReplaceAll(" ","_");
+        Int_t population = ((TString)arr->At(1)->GetName()).Atoi();
+
+        fPopulationMap[Country] = population;
+    }
 }
 
 void covid_viewer::UpdateCountryList()
@@ -288,6 +327,7 @@ void covid_viewer::UpdateCountryList()
     for(int i=2 ; i<l->GetEntries() ;i++) {
         TString FileName = l->At(i)->GetName();
         if(FileName == "country_list.csv") continue;
+        if(FileName == "Population.csv") continue;
         fCountryBox->AddEntry(FileName.ReplaceAll(".csv",""),i);
     }
     fCountryBox->Select(0);
@@ -354,7 +394,7 @@ void covid_viewer::PlotData()
     fCurrentHist->SetLineColor(color);
 
 
-    Float_t Max=1;
+    Float_t Max=0;
     TH1 *fFirstHist = nullptr;
 
     for(int i=0 ; i<fCanvas->GetListOfPrimitives()->GetEntries() ; i++) {
@@ -378,7 +418,7 @@ void covid_viewer::PlotData()
         }
     }
 
-    fFirstHist->GetYaxis()->SetRangeUser(1,Max*1.2);
+    fFirstHist->GetYaxis()->SetRangeUser(0,Max*1.2);
 
     gPad->Modified();
     gPad->Update();
@@ -435,8 +475,8 @@ bool covid_viewer::ReadData()
     TString DataGraphTitleDaily = CountryName.Copy().ReplaceAll("_"," ");
     TString DataGraphTitleTotal = CountryName.Copy().ReplaceAll("_"," ");
 
-    DataGraphNameDaily += "_Daily";
-    DataGraphNameTotal += "_Total";
+    DataGraphNameDaily += "__Daily";
+    DataGraphNameTotal += "__Total";
 
     DataGraphTitleDaily += ", daily";
     DataGraphTitleTotal += ", total";
@@ -560,6 +600,7 @@ bool covid_viewer::ReadData()
 
     if(fTypeBox->GetSelected()==0) fDataTotalHist->GetYaxis()->SetTitle("TOTAL CASES");
     else fDataTotalHist->GetYaxis()->SetTitle("TOTAL DEATHS");
+    if(fApplyPopulationRatio) fDataTotalHist->GetYaxis()->SetTitle(Form("%s (poputlation %%)",fDataTotalHist->GetYaxis()->GetTitle()));
     fDataTotalHist->GetYaxis()->CenterTitle();
     fDataTotalHist->GetXaxis()->SetLabelSize(0.05);
     fDataTotalHist->GetXaxis()->SetTitleOffset(1.);
@@ -588,6 +629,7 @@ bool covid_viewer::ReadData()
 
     if(fTypeBox->GetSelected()==0) fDataDailyHist->GetYaxis()->SetTitle("CASES / DAY");
     else fDataDailyHist->GetYaxis()->SetTitle("DEATH / DAY");
+    if(fApplyPopulationRatio) fDataDailyHist->GetYaxis()->SetTitle(Form("%s (population %%)",fDataDailyHist->GetYaxis()->GetTitle()));
     fDataDailyHist->GetYaxis()->CenterTitle();
     fDataDailyHist->GetXaxis()->SetLabelSize(0.05);
     fDataDailyHist->GetXaxis()->SetTitleOffset(1.);
@@ -636,15 +678,39 @@ bool covid_viewer::ReadData()
         if(i<vDeaths_Tot.size() && vDeaths_Tot.at(i)) {
             Int_t Bin = fDataTotalHist->GetXaxis()->FindFixBin(vDates.at(i));
             if(Bin>0) {
-                fDataTotalHist->SetBinContent(Bin,vDeaths_Tot.at(i));
-                fDataTotalHist->SetBinError(Bin,sqrt(vDeaths_Tot.at(i)));
+                if(fApplyPopulationRatio) {
+                    if(fPopulationMap.count(CountryName)) {
+                        fDataTotalHist->SetBinContent(Bin,vDeaths_Tot.at(i)/fPopulationMap[CountryName]*100.);
+                        fDataTotalHist->SetBinError(Bin,sqrt(vDeaths_Tot.at(i))/fPopulationMap[CountryName]*100.);
+                    }
+                    else {
+                        cout << "OUPS, POPULATION NOT FOUND FOR COUNTRY: "<<CountryName<<endl;
+                        return false;
+                    }
+                }
+                else {
+                    fDataTotalHist->SetBinContent(Bin,vDeaths_Tot.at(i));
+                    fDataTotalHist->SetBinError(Bin,sqrt(vDeaths_Tot.at(i)));
+                }
             }
         }
         if(i<vDeaths.size() && vDeaths.at(i)) {
             Int_t Bin = fDataDailyHist->GetXaxis()->FindFixBin(vDates.at(i));
             if(Bin>0) {
-                fDataDailyHist->SetBinContent(Bin,vDeaths.at(i));
-                fDataDailyHist->SetBinError(Bin,vDeaths_e.at(i));
+                if(fApplyPopulationRatio) {
+                    if(fPopulationMap.count(CountryName)) {
+                        fDataDailyHist->SetBinContent(Bin,vDeaths.at(i)/fPopulationMap[CountryName]*100.);
+                        fDataDailyHist->SetBinError(Bin,vDeaths_e.at(i)/fPopulationMap[CountryName]*100.);
+                    }
+                    else {
+                        cout << "OUPS, POPULATION NOT FOUND FOR COUNTRY: "<<CountryName<<endl;
+                        return false;
+                    }
+                }
+                else {
+                    fDataDailyHist->SetBinContent(Bin,vDeaths.at(i));
+                    fDataDailyHist->SetBinError(Bin,vDeaths_e.at(i));
+                }
             }
 
             //            cout<<left<<setw(10)<<vDates.at(i)<<setw(10)<<vDeaths.at(i)<<setw(10)<<vDeaths_Tot.at(i)<<endl;
@@ -859,12 +925,23 @@ void covid_viewer::HandleMenu(Int_t id)
             SetMinimizerWindow(min);
         }
         break;
+    case M_POP_RATIO:
+        if(fApplyPopulationRatio) {
+            fApplyPopulationRatio = false;
+            fMenuOptions->UnCheckEntry(M_POP_RATIO);
+        }
+        else {
+            fApplyPopulationRatio = true;
+            fMenuOptions->CheckEntry(M_POP_RATIO);
+        }
+        break;
     case M_UPDATE:
         TString command = Form("python3 %s/scripts/script.py",getenv("COVID_PLAYER_SYS"));
         system(command.Data());
         UpdateCountryList();
         break;
     }
+
 }
 
 void covid_viewer::SaveCanvasAs()

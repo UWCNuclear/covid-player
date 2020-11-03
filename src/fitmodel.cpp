@@ -97,6 +97,11 @@ void fitmodel::DoFit()
     TH1 *h = fMainWindow->GetHistoToFit();
     if(h == nullptr) return;
 
+    TString CountryName;
+    TObjArray *arr = ((TString)h->GetName()).Tokenize("__");
+    CountryName = arr->First()->GetName();
+    delete arr;
+
     delete fFitFunction;
     delete fErrorBand;
 
@@ -133,7 +138,14 @@ void fitmodel::DoFit()
     // Add a dummy point at 5* the current max (to force to be at 0 for t infinity)
 
     g->SetPoint(g->GetN(),5*xMax,0.);
-    g->SetPointError(g->GetN()-1,0.,0.1);
+
+    if(fMainWindow->fApplyPopulationRatio) {
+        Int_t population = fMainWindow->fPopulationMap[CountryName];
+        g->SetPointError(g->GetN()-1,0.,0.1/population*100.);
+    }
+    else {
+        g->SetPointError(g->GetN()-1,0.,0.1);
+    }
 
     fFitFunction->FixParameter(fFitFunction->GetNpar()-1,g->GetX()[0]);
 
