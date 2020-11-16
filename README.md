@@ -28,6 +28,7 @@ cd ..
 Some python3 depedancies are necessary to download the data from worldometers:
 
 ```
+pip3 install requests
 pip3 install numpy
 pip3 install pandas
 pip3 install setuptools
