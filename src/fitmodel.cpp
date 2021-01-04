@@ -102,8 +102,10 @@ void fitmodel::DoFit()
     CountryName = arr->First()->GetName();
     delete arr;
 
+    if(fMainWindow->fDrawSameButton->GetState() == kButtonUp) {
     delete fFitFunction;
     delete fErrorBand;
+    }
 
     InitParameters();
 

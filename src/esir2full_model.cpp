@@ -247,7 +247,7 @@ void esir2full_model::InitParameters()
 {
     TH1 *h = fMainWindow->GetHistoToFit();
 
-    fFitFunction = new TF1(Form("ESIR2_%s",h->GetName()),this,&esir2full_model::FitFunction,h->GetXaxis()->GetXmin(),h->GetXaxis()->GetXmax(),fNPars,"fitmodel","FitFunction");
+    fFitFunction = new TF1(Form("ESIR2_%s_%s",h->GetName(),fFitRange[1]->GetText()),this,&esir2full_model::FitFunction,h->GetXaxis()->GetXmin(),h->GetXaxis()->GetXmax(),fNPars,"fitmodel","FitFunction");
     fFitFunction->SetNpx(1000);
     fFitFunction->SetLineColor(kRed);
 

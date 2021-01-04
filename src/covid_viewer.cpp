@@ -165,7 +165,7 @@ covid_viewer::covid_viewer(const TGWindow *p, UInt_t w, UInt_t h): TGMainFrame(p
     fMounthMax->AddEntry("October",10);
     fMounthMax->AddEntry("November",11);
     fMounthMax->AddEntry("December",12);
-    fMounthMax->Select(1);
+    fMounthMax->Select(3);
     hframe->AddFrame(fMounthMax, new TGLayoutHints( kLHintsCenterY  | kLHintsLeft ,0,0,0,0));
     fMounthMax->Connect("Selected(Int_t)", "covid_viewer", this, "HandleMounthRange()");
     fMounthMax->Connect("Selected(Int_t)", "covid_viewer", this, "HandleDateRange()");
@@ -524,6 +524,8 @@ bool covid_viewer::ReadData()
 
     int NToRemove = 0;
 
+    Int_t Current_Year = 20;
+
     while(file) {
         getline(file,line);
         Buffer = line;
@@ -550,8 +552,10 @@ bool covid_viewer::ReadData()
         if(temp->GetEntries()==0) continue;
         TString Mounth_tmp = (TString)temp->At(0)->GetName();
         Day = ((TString)temp->At(1)->GetName()).Atoi();
-        Date = Form("%d-%s-20",Day,Mounth_tmp.Data());
+        Date = Form("%d-%s-%d",Day,Mounth_tmp.Data(),Current_Year);
         delete temp;
+
+        if(Date.BeginsWith("31-Dec")) Current_Year++;
 
         //        if(Date == "16-Jun" && CountryName == "India") NToRemove = 1600;
         //        if(Date == "6-May" && CountryName == "Belgium") NToRemove = 240;

@@ -39,7 +39,7 @@ private:
     enum ButtonsTypes {kButtonTotal, kButtonDaily};
     enum ETestCommandIdentifiers { M_FILE_EXIT, M_FILE_SAVE, M_UPDATE, M_MINIMIZER,M_POP_RATIO};
 
-private:
+public:
 
     TGMenuBar *fMenuBar = nullptr;
     TGPopupMenu *fMenuFile = nullptr;
@@ -81,7 +81,7 @@ private:
     vector<Double_t> vDeaths_Tot_e;
 
     TString DateMinStr="1-Mar-20";
-    TString DateMaxStr="1-Jan-21";
+    TString DateMaxStr="1-Mar-21";
 
     Int_t DateMin=0;
     Int_t DateMax=0;
