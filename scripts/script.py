@@ -133,6 +133,10 @@ def clean_data(res, info_label):
     for i,d in enumerate(data):
         if d.find('xAxis') != -1:
             date_range = data[i+1]
+            date_range = data[i+1]
+            date_range = date_range.replace("\",\"","dummy")
+            date_range = date_range.replace(",","$")
+            date_range = date_range.replace("dummy","\",\"")
             date_range = re.search(r"(?<=\[).*?(?=\])", date_range).group(0).split(",")
             date_range = [t.strip('\"') for t in date_range]
             # print(i)

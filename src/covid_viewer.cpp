@@ -307,6 +307,7 @@ void covid_viewer::ReadPopulation()
         Int_t population = ((TString)arr->At(1)->GetName()).Atoi();
 
         fPopulationMap[Country] = population;
+        if(Country == "France") fPopulationMap["France_Hosp"] = population;
     }
 }
 
@@ -547,6 +548,10 @@ bool covid_viewer::ReadData()
         }
         else continue;
         TString Date = (TString)arr->At(1)->GetName();
+        TObjArray *arr2 = Date.Tokenize("$");
+        Date = arr2->First()->GetName();
+        delete arr2;
+
         Date.ReplaceAll(" ","-");
         TObjArray *temp = Date.Tokenize("-");
         if(temp->GetEntries()==0) continue;
